@@ -9,12 +9,26 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
+use App\Http\Requests\LoginRequest;
+
 class UserController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:api', ['except' => ['login']]);
-    // }
+
+    public function data(Request $request)
+    {
+        return response()->json(
+           
+           
+            [['title'=>'ux designer','id'=>1,'details'=>'lorem'],
+            ['title'=>'uxa designer','id'=>2,'details'=>'lorem'],
+            ['title'=>'uxb designer','id'=>3,'details'=>'lorem'],
+            ['title'=>'uxc designer','id'=>4,'details'=>'lorem']],
+            
+            200);
+            
+            
+    }
+
 
     public function create(Request $request)
     {
@@ -27,7 +41,7 @@ class UserController extends Controller
 
         if($valid->fails())
         {
-            return response()->json($valid->errors(),401);
+            return response()->json($valid->errors(),422);
 
         }
         else
@@ -58,24 +72,11 @@ class UserController extends Controller
         }
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $valid=Validator::make($request->all(),[
-            'email'=>'required',
-            'password'=>'required',
-        ]);
-
-        if($valid->fails())
-        {
-            return response()->json($valid->errors(),401);
-
-        }else{
-
-            if (! $token = Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-                return response()->json(['error' => 'Unauthorized'], 401);
-            }
-
-            return $this->respondWithToken($token);
-            }
+        if (! $token = Auth::guard('api')->attempt(['email' => $request->email, 'password' => $request->password])) {
+            return response()->json(['message' => 'your password or email is incorrect.','status'=> false], 422);
         }
+        return $this->respondWithToken($token);        
+    }
 }

@@ -60,4 +60,8 @@ class studentController extends Controller
         }
     }
 
+    public function index(){
+        return Student::all();
+      }
+
 }
